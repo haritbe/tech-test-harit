@@ -20,11 +20,31 @@ describe('express', function () {
   });
 
   describe('basic auth', async() => {
-    it('should respond with 200 when called with valid Authorization header value', async () => {
-      const res = await request(server)
+    it('should respond with 200 when called with valid Authorization header value',  (done) => {
+      request(server)
       .get('/basic-auth')
-      .set('authorization', 'Basic bWF0dEBnbWFpbC5jb206dGhpcyBpcyBhIHZAbGlkIHBhc3N3b3JkIQ==');
-      expect(res.statusCode).to.equal(200);
+      .set('authorization', 'Basic bWF0dEBnbWFpbC5jb206dGhpcyBpcyBhIHZAbGlkIHBhc3N3b3JkIQ==')
+      .then(res => {
+        expect(res.statusCode).to.equal(200);
+        done();
+      });
+    });
+    it('should respond with 401 when called with no Authorization header value',  (done) => {
+      request(server)
+      .get('/basic-auth')
+      .then(res => {
+        expect(res.statusCode).to.equal(401);
+        done();
+      });
+    });
+    it('should respond with 401 when called with malformed Authorization header value',  (done) => {
+      request(server)
+      .get('/basic-auth')
+      .set('authorization', 'Basic testheader:testpass')
+      .then(res => {
+        expect(res.statusCode).to.equal(401);
+        done();
+      });
     });
   })
 });
